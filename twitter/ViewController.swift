@@ -9,71 +9,80 @@ class ViewController: UIViewController {
     var myButton: UIButton!
     var twitter: Bool = false
     var faceBook: Bool = false
-    let tests: String = "check"
     override func viewDidLoad() {
         super.viewDidLoad()
         createTwitterButton()
         createFaceBookButton()
-        createButton()
-        
+        createPlayButton()
     }
     
-
     // ボタンイベント.
     @objc func onPostToTwitter(sender : AnyObject) {
         twitter = true
-        // SLComposeViewControllerのインスタンス化.
-        // ServiceTypeをTwitterに指定.
-        myComposeView = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-        // 投稿するテキストを指定.
-        myComposeView.setInitialText("Twitter Test from Swift")
-        // 投稿する画像を指定.
-        myComposeView.add(UIImage(named: "sample.jpg"))
-        // myComposeViewの画面遷移.
-        self.present(myComposeView, animated: true, completion: nil)
-        
     }
 
     // ボタンイベント.
     @objc func onPostToFaceBook(sender : AnyObject) {
         faceBook = true
-        // SLComposeViewControllerのインスタンス化.
-        // ServiceTypeをTwitterに指定.
-        myComposeView = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
-        // 投稿するテキストを指定.
-        myComposeView.setInitialText("Twitter Test from Swift")
-        // 投稿する画像を指定.
-        myComposeView.add(UIImage(named: "sample.jpg"))
-        // myComposeViewの画面遷移.
-        self.present(myComposeView, animated: true, completion: nil)
     }
     
     // つぶやくボタンイベント.
     @objc func onPostTo(sender : AnyObject) {
-        test()
-        test2()
+        twitterPlay()
+        
+        //ツイート処理判定
+        myComposeView?.completionHandler = {
+            (result:SLComposeViewControllerResult) -> () in
+            switch (result) {
+            // 投稿した
+            case SLComposeViewControllerResult.done:
+                print("tweeted")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.FaceBookPlay()                    // your code here
+                    self.twitter = false
+                    self.faceBook = false
+                    
+                }
+            // キャンセルした
+            case SLComposeViewControllerResult.cancelled:
+                print("tweet cancel")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.FaceBookPlay()                    // your code here
+                    self.twitter = false
+                    self.faceBook = false
+                }
+            }
+        }
+        
+        if !twitter {
+            FaceBookPlay()
+        }
     }
     
 
-    func test(){
-        myComposeView = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-        // 投稿するテキストを指定.
-        myComposeView.setInitialText("Twitter Test from Swift")
-        // 投稿する画像を指定.
-        myComposeView.add(UIImage(named: "sample.jpg"))
-        // myComposeViewの画面遷移.
-        self.present(myComposeView, animated: true, completion: nil)
+    func twitterPlay(){
+        if twitter {
+            myComposeView = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
+            // 投稿するテキストを指定.
+            myComposeView.setInitialText("Twitter Test from Swift")
+            // 投稿する画像を指定.
+            myComposeView.add(UIImage(named: "sample.jpg"))
+            // myComposeViewの画面遷移.
+            self.present(myComposeView, animated: true, completion: nil)
+        }
     }
-    func test2() {
-        // ServiceTypeをTwitterに指定.
-        myComposeView = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
-        // 投稿するテキストを指定.
-        myComposeView.setInitialText("Twitter Test from Swift")
-        // 投稿する画像を指定.
-        myComposeView.add(UIImage(named: "sample.jpg"))
-        // myComposeViewの画面遷移.
-        self.present(myComposeView, animated: true, completion: nil)
-
+    
+    func FaceBookPlay(){
+        if faceBook {
+            // ServiceTypeをTwitterに指定.
+            myComposeView = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
+            // 投稿するテキストを指定.
+            myComposeView.setInitialText("Twitter Test from Swift")
+            // 投稿する画像を指定.
+            myComposeView.add(UIImage(named: "sample.jpg"))
+            // myComposeViewの画面遷移.
+            self.present(myComposeView, animated: true, completion: nil)
+        }
     }
 
 
@@ -110,7 +119,7 @@ class ViewController: UIViewController {
         self.view.addSubview(myFaceBookButton)
     }
     
-    func createButton() {
+    func createPlayButton() {
         myButton = UIButton()
         myButton.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
         myButton.backgroundColor = UIColor.blue
